@@ -1,0 +1,28 @@
+Package: glmerGOF
+Type: Package
+Title: Goodness of Fit of Random Effect Distribution in Logistic Mixed Model
+Version: 0.0.0.9001
+Authors@R: c(person("Brian G.", "Barkley", email = "BarkleyBG@outlook.com", 
+    role = c("aut", "cre")))
+Description: Implements a goodness of fit test of the presumed Gaussian
+    distribution of the random effect in generalized linear mixed models. This
+    package implements the method described in Tchetgen and Coull (2006) A 
+    Diagnostic Test for the Mixing Distribution in a Generalised Linear Mixed 
+    Model for logistic models fit with lme4::glmer(). 
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    survival,
+    lme4,
+    cubature,
+    numDeriv
+Suggests: 
+    testthat,
+    knitr,
+    rmarkdown,
+    rprojroot,
+    data.table
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.0
+VignetteBuilder: knitr
+License: GPL-3

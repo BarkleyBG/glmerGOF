@@ -1,0 +1,110 @@
+---
+title: "Introduction to glmerGOF package"
+author: "Brian G. Barkley"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This is an introduction and tutorial to the glmerGOF package. This package implements a test of the goodness of fit of the presumed Gaussian random effect distribution in the logistic mixed models fit with `lme4::glmer()`. The method is introduced in Tchetgen, E. J., & Coull, B. A. (2006) _A Diagnostic Test for the Mixing Distribution in a Generalised Linear Mixed Model_. Biometrika, 93(4), 1003-1010. \url{https://doi.org/10.1093/biomet/93.4.1003}. This test is implemented in `glmerGOF::testGOF()`, as described below.
+
+# Using glmerGOF
+
+We begin with a simple data example, with data simulated as shown in the [geex package](https://bsaul.github.io/geex/articles/articles/lme4_discussion.html#setup)
+
+```{r}
+library(glmerGOF)
+set.seed(1)
+#generate data; 50 clusters
+n <- 50
+m <- 4
+beta <- c(2, 2)
+id <- rep(1:n, each=m)
+x <- rnorm(m*n)
+b <- rep(rnorm(n), each=m)
+y <- rbinom(m*n, 1, plogis(cbind(1, x) %*% beta + b))
+my_data <- data.frame(y,x,id) 
+
+knitr::kable(head(my_data), digits = 2)
+```
+
+The `testGOF()` function in this package takes arguments for the original data, as well as two models. One model is fit with `lme4::glmer()`, and the other is a conditional logistic model fit with `survival::clogit()`.
+
+## Fitting the two models
+
+The two models are fit outside of the `glmerGOF()` package. The `testGOF()` function attempts to match the coefficients of the two models to produce the test results.
+
+### Generalized logistic mixed model
+
+```{r}
+library(lme4)
+fit_glmm <- lme4::glmer(
+  formula = y ~ x + (1|id),
+  family = "binomial",
+  data = my_data
+)
+```
+
+### Conditional logistic model
+
+```{r}
+library(survival)
+fit_clogit <- survival::clogit(
+  formula = y ~ x + strata(id),
+  data = my_data,
+  method = "exact"
+)
+```
+
+## Executing the GOF test
+
+Once the models are fit, there are only a few more steps. One step is to provide a list of two important variable names, as strings. `DV` is the dependent variable in the model, and `grouping` is the variable indicating the cluster membership.
+
+```{r}
+variable_names <- list(DV = "y", grouping = "id")
+```
+
+Lastly, choose whether you want 
+```{r}
+deriv_method <- 
+  # "Richardson" ## for slower but more accurate computations
+  "simple" ## for faster computation
+
+```
+
+Now, testGOF can be run by passing in the data, models, and variable names:
+
+```{r}
+TC_test <- testGOF(
+  data = my_data,
+  fitted_model_clogit = fit_clogit,
+  fitted_model_glmm  = fit_glmm,
+  var_names = variable_names, 
+  gradient_derivative_method = deriv_method
+)
+
+```
+
+The test statistic follows a chi-squared distribution with degrees of freedom equal to the number of parameters:
+
+```{r}
+TC_test$results
+```
+
+
+
+
+
+
+
+

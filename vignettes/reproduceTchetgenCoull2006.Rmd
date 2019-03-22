@@ -1,0 +1,223 @@
+---
+title: "Reproducing Results from Tchetgen and Coull (2006)"
+author: "Brian G. Barkley"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+  , eval = TRUE
+  # , eval = ifelse(interactive(), TRUE, FALSE)
+)
+```
+
+This vignette is designed to show similarities and differences with the SAS implementation of this goodness of fit test. Here, we analyse the dataset from Tchetgen and Coull (2006), and compare the test results to those shown in the paper.
+
+# Compute GOF with glmerGOF package
+
+```{r libraries}
+library(glmerGOF)
+library(lme4)
+library(survival)
+```
+
+
+## Download and prepare data
+
+```{r data, message = FALSE, include=FALSE}
+
+amenorrhea_url <- "https://content.sph.harvard.edu/fitzmaur/ala/amenorrhea.txt"
+
+amenorrhea_data <- data.table::fread(
+  input = amenorrhea_url,
+  sep = " ",
+  na.strings = ".",
+  skip = 43,
+  col.names = c("ID", "Dose", "Occasion", "AmenorrheaStatus")
+)
+amenorrhea_data$Occasion_squared <-  (amenorrhea_data$Occasion)^2
+```
+
+## Fit models
+
+### Generalized Linear Mixed Model
+
+```{r glmer, messsage=FALSE, warning=FALSE}
+fit_glmm <- lme4::glmer(
+  formula =
+    AmenorrheaStatus ~ Occasion + Occasion_squared + Dose:Occasion +
+    Dose:Occasion_squared  + (1 | ID), 
+  family = "binomial", 
+  data = amenorrhea_data, 
+  nAGQ = 50
+)
+```
+
+### Conditional Logistic Regression
+
+```{r clogit}
+fit_clogit <- survival::clogit(
+  formula =
+    AmenorrheaStatus ~ Occasion + Occasion_squared + Dose:Occasion +
+    Dose:Occasion_squared  + strata(ID),
+  data = amenorrhea_data,
+  method = "exact"
+)
+```
+
+## Compute goodness of fit statistic
+
+```{r testGOF}
+
+TC_test <- glmerGOF::testGOF(
+  data = amenorrhea_data
+  , fitted_model_clogit = fit_clogit
+  , fitted_model_glmm  = fit_glmm
+  , var_names = list(DV = "AmenorrheaStatus", grouping = "ID")
+  , gradient_derivative_method = "Richardson"
+)
+
+```
+
+
+## Report GOF test results
+
+```{r report testGOF results}
+print(TC_test)
+```
+
+# Comparison of results
+
+## Direct comparison to original article
+
+The original results reported in Tchetgen and Coull (2006) for method that did not require influence functions were:
+
+```{r TC results}
+TC_results <- list(D = 14.29, p_value = .0064)
+TC_results
+```
+
+The results from the glmerGOF method different quantitatively, but not qualitatively. That is, each test reached statistical significance at the $\alpha = 0.05$ level.
+
+## Comparison to results from SAS
+
+Tchetgen and Coull (2006) provide results when using PROC NLMIXED for the mixed effect model, and PROC LogXact for the conditional logistic model. We provide a comparison of estimated coefficients and variance components for both procedures here.
+
+### Conditional Logistic Model
+
+The test summary is shown here
+
+```{r}
+test_summary <- summary(TC_test)
+```
+
+
+### Generalized Logistic Mixed Model
+
+Fitting these same models with PROC NLMIXED results in the following estimates:
+
+```{r}
+dimnames_sas_original <- c("b_int", "b_time", "b_trt_time", "b_timesq", "b_trt_timesq", "s1")
+dimnames_sas_as_r <- c("(Intercept)", "Occasion", "Occasion:Dose", "Occasion_squared",
+                         "Occasion_squared:Dose", "ID.(Intercept)")
+
+glmm_proc_nlmixed_fit <- list(
+  theta = structure(
+    c(-3.8057, 1.1332, 0.5644, -0.04193, -0.1096, 2.2505), 
+    .Dim = c(1L, 6L),
+    .Dimnames = list(
+      "", dimnames_sas_as_r
+    )
+  ),
+  sigma = structure(
+    c(0.09301, -0.06801, -0.00308, 0.01187,
+      0.00062, -0.01527, -0.06801, 0.07194, -0.0178, -0.01421, 0.004426,
+      0.00433, -0.00308, -0.0178, 0.03696, 0.004576, -0.00909, 0.002827,
+      0.01187, -0.01421, 0.004576, 0.003004, -0.00124, -0.00016, 0.00062,
+      0.004426, -0.00909, -0.00124, 0.002461, -0.00052, -0.01527, 0.00433,
+      0.002827, -0.00016, -0.00052, 0.01684),
+    .Dim = c(6L, 6L),
+    .Dimnames = list(
+      # c("b_int", "b_time", "b_trt_time", "b_timesq", "b_trt_timesq", "s1"),
+      # c("b_int", "b_time", "b_trt_time", "b_timesq", "b_trt_timesq", "s1")
+      dimnames_sas_as_r, dimnames_sas_as_r
+    )
+  )
+)
+
+
+     
+```
+
+For the fitted model coefficients, the discrepancy is very small:
+
+```{r}
+sas_theta <- glmm_proc_nlmixed_fit$theta[1, c(1,2,4,3,5,6)]
+r_theta <- TC_test$fits$theta_glmm
+knitr::kable(rbind(
+  SAS = sas_theta,
+  R = r_theta,
+  diff = sas_theta - r_theta,
+  diff_scaled = (sas_theta - r_theta)/r_theta
+), digits = 5)
+
+```
+
+
+There is a small discrepancy in the estimated variance components. For the cells in the submatrix that is used to calculate the estimated variance component of the test statistic, the scaled discrepancy is at most 11%. First we show the submatrix estimated from R:
+
+```{r}
+sas_sigma <- glmm_proc_nlmixed_fit$sigma[c(1,2,4,3,5,6), c(1,2,4,3,5,6)]
+r_sigma <- TC_test$fits$sigma_glmm
+if (is.null(colnames(r_sigma))){
+  colnames(r_sigma) <- rownames(r_sigma) <- names(r_theta)
+}
+knitr::kable(r_sigma[2:5, 2:5], digits = 3)
+```
+
+The submatrix estimated from PROC NLMIXED is:
+
+```{r}
+knitr::kable(sas_sigma[2:5, 2:5], digits = 3)
+```
+
+The scaled discrepancy is at most 11%:
+
+```{r}
+knitr::kable( (sas_sigma[2:5, 2:5] - r_sigma[2:5, 2:5]) / r_sigma[2:5, 2:5], digits = 3)
+```
+
+### Reproducing p-value
+
+The original test statistics reported in Tchetgen and Coull (2006) can be reproduced exacly when combining the estimated variance matrix from PROC NLMIXED, which shows only small discrepancies to that produced by the glmerGOF package, with all other components estimated in R:
+
+
+```{r}
+combined_args <- TC_test$fits
+combined_args$sigma_glmm <- sas_sigma
+
+deltas <- do.call(glmerGOF::computeDeltas, combined_args)
+
+test_stat <- do.call(glmerGOF::computeD, deltas)
+
+list(
+  D = as.numeric(round(test_stat, digits=2)), 
+  p_value = round(1-pchisq(as.numeric(test_stat), df=4), digits = 4)
+)
+```
+which compares favorably to the original manuscript's results:
+
+```{r}
+TC_test$results
+```
+
+
+
+

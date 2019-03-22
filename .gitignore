@@ -1,0 +1,6 @@
+inst/doc
+scratch/*
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
