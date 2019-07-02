@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-<!-- [![lifecycle](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing) -->
+[![lifecycle](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://www.tidyverse.org/lifecycle/#stable)
 
 # glmerGOF
 
@@ -57,18 +57,19 @@ TC_test$results
 # [1] 0.267387
 ```
 
+# Potential future developments
+
+Please refer to the lifecycle badge for its current status. This package
+was created in early 2019 and may undergo future developments. Please
+email the maintainer if any of these changes are of interest, or if you
+would like to work on them:
+
+  - Ability to manually align glmer and clogit coefficients
+  - Parallelization backend
+  - Updated model options
+
 # Contributor Code of Conduct
 
 Please note that the ‘glmerGOF’ project is released with a [Contributor
 Code of Conduct](CODE_OF_CONDUCT.md). By contributing to this project,
 you agree to abide by its terms.
-
-# Potential future developments
-
-This package was created in early 2019 and may undergo future
-developments. Please email the maintainer if any of these changes are of
-interest, or if you would like to work on them:
-
-  - Ability to manually align glmer and clogit coefficients
-  - Parallelization backend
-  - Updated model options
