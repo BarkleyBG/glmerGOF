@@ -22,20 +22,19 @@ distribution of the random effect in logistic mixed models fit with
 `lme4::glmer(family = "binomial")`. The method implemented is introduced in 
 Tchetgen and Coull (2006):
 
-Tchetgen, E. J., & Coull, B. A. (2006) _A Diagnostic Test for the Mixing Distribution in a Generalised Linear Mixed Model_. Biometrika, 93(4), 1003-1010. \url{https://doi.org/10.1093/biomet/93.4.1003}
+Tchetgen, E. J., & Coull, B. A. (2006) _A Diagnostic Test for the Mixing Distribution in a Generalised Linear Mixed Model_. Biometrika, 93(4), 1003-1010. DOI: [10.1093/biomet/93.4.1003](https://doi.org/10.1093/biomet/93.4.1003)
 
 ## Installation
 
-glmerGOF is under development and available through github:
+glmerGOF is available through github:
 
 ```{r, eval = FALSE}
-# install.packages("glmerGOF")
 remotes::install_github("BarkleyBG/glmerGOF")
 ```
 
 ## Usage
 
-An introductory tutorial is provided that describes how to use this package. The function that implements the test is `glmerGOF::testGOF()`, which takes as input:
+An introductory tutorial is provided that describes how to use this package. The function that implements the test is `glmerGOF::testGOF()`, which takes as mandatory input:
 
 - a fitted `lme4::glmer()` model
 - a fitted `survival::clogit()` model

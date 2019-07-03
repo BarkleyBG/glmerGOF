@@ -12,14 +12,14 @@ implemented is introduced in Tchetgen and Coull (2006):
 
 Tchetgen, E. J., & Coull, B. A. (2006) *A Diagnostic Test for the Mixing
 Distribution in a Generalised Linear Mixed Model*. Biometrika, 93(4),
-1003-1010. 
+1003-1010. DOI:
+[10.1093/biomet/93.4.1003](https://doi.org/10.1093/biomet/93.4.1003)
 
 ## Installation
 
-glmerGOF is under development and available through github:
+glmerGOF is available through github:
 
 ``` r
-# install.packages("glmerGOF")
 remotes::install_github("BarkleyBG/glmerGOF")
 ```
 
@@ -27,7 +27,7 @@ remotes::install_github("BarkleyBG/glmerGOF")
 
 An introductory tutorial is provided that describes how to use this
 package. The function that implements the test is `glmerGOF::testGOF()`,
-which takes as input:
+which takes as mandatory input:
 
   - a fitted `lme4::glmer()` model
   - a fitted `survival::clogit()` model
