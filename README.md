@@ -6,6 +6,8 @@
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://www.tidyverse.org/lifecycle/#stable)
 [![Codecov test
 coverage](https://codecov.io/gh/BarkleyBG/glmerGOF/branch/master/graph/badge.svg)](https://codecov.io/gh/BarkleyBG/glmerGOF?branch=master)
+[![Travis-CI Build
+Status](https://travis-ci.org/BarkleyBG/glmerGOF.svg?branch=master)](https://travis-ci.org/BarkleyBG/glmerGOF)
 <!-- badges: end -->
 
 # glmerGOF
