@@ -22,7 +22,8 @@ Suggests:
     knitr,
     rmarkdown,
     rprojroot,
-    data.table
+    data.table,
+    covr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.0
 VignetteBuilder: knitr
