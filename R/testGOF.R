@@ -43,7 +43,7 @@
 #' arguments, and their estimated components are wrangled in
 #' \code{\link{grabModelEstimates}}.
 #'
-#' @references Tchetgen, E. J., & Coull, B. A. (2006) \emph{A Diagnostic Test for the Mixing
+#' @references Tchetgen Tchetgen, E. J., & Coull, B. A. (2006) \emph{A Diagnostic Test for the Mixing
 #' Distribution in a Generalised Linear Mixed Model.} Biometrika, 93(4),
 #' 1003-1010. \url{https://doi.org/10.1093/biomet/93.4.1003}
 #'

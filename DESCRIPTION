@@ -7,9 +7,9 @@ Authors@R: c(person("Brian G.", "Barkley", email = "BarkleyBG@outlook.com",
     role = c("aut", "cre")))
 Description: Implements a goodness of fit test of the presumed Gaussian
     distribution of the random effect in generalized linear mixed models. This
-    package implements the method described in Tchetgen and Coull (2006) A 
-    Diagnostic Test for the Mixing Distribution in a Generalised Linear Mixed 
-    Model for logistic models fit with lme4::glmer(). 
+    package implements the method described in Tchetgen Tchetgen and Coull 
+    (2006) A Diagnostic Test for the Mixing Distribution in a Generalised Linear 
+    Mixed Model for logistic models fit with lme4::glmer(). 
 Encoding: UTF-8
 LazyData: true
 Imports: 
