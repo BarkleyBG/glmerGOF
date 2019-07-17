@@ -2,7 +2,7 @@ Package: glmerGOF
 Type: Package
 Title: Goodness of Fit of Random Effect Distribution in Logistic Mixed Model
 Version: 0.1.0
-Date: 2019-07-03
+Date: 2019-07-17
 Authors@R: c(person("Brian G.", "Barkley", email = "BarkleyBG@outlook.com", 
     role = c("aut", "cre")))
 Description: Implements a goodness of fit test of the presumed Gaussian

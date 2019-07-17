@@ -1,10 +1,10 @@
 ---
-title: "Reproducing Results from Tchetgen and Coull (2006)"
+title: "Reproducing Results from Tchetgen Tchetgen and Coull (2006)"
 author: "Brian G. Barkley"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{ReproduceResults}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -97,7 +97,7 @@ print(TC_test)
 
 ## Direct comparison to original article
 
-The original results reported in Tchetgen and Coull (2006) for method that did not require influence functions were:
+The original results reported in Tchetgen Tchetgen and Coull (2006) for method that did not require influence functions were:
 
 ```{r TC results}
 TC_results <- list(D = 14.29, p_value = .0064)
@@ -108,7 +108,7 @@ The results from the glmerGOF method different quantitatively, but not qualitati
 
 ## Comparison to results from SAS
 
-Tchetgen and Coull (2006) provide results when using PROC NLMIXED for the mixed effect model, and PROC LogXact for the conditional logistic model. We provide a comparison of estimated coefficients and variance components for both procedures here.
+Tchetgen Tchetgen and Coull (2006) provide results when using PROC NLMIXED for the mixed effect model, and PROC LogXact for the conditional logistic model. We provide a comparison of estimated coefficients and variance components for both procedures here.
 
 ### Conditional Logistic Model
 
@@ -196,7 +196,7 @@ knitr::kable( (sas_sigma[2:5, 2:5] - r_sigma[2:5, 2:5]) / r_sigma[2:5, 2:5], dig
 
 ### Reproducing p-value
 
-The original test statistics reported in Tchetgen and Coull (2006) can be reproduced exacly when combining the estimated variance matrix from PROC NLMIXED, which shows only small discrepancies to that produced by the glmerGOF package, with all other components estimated in R:
+The original test statistics reported in Tchetgen Tchetgen and Coull (2006) can be reproduced exacly when combining the estimated variance matrix from PROC NLMIXED, which shows only small discrepancies to that produced by the glmerGOF package, with all other components estimated in R:
 
 
 ```{r}
