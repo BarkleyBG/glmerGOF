@@ -44,21 +44,22 @@ fit_clogit <- survival::clogit(
   method = "exact"
 )
 
-TC_test <- testGOF(
+test_results <- testGOF(
   data = my_data,
   fitted_model_clogit = fit_clogit,
   fitted_model_glmm  = fit_glmm,
-  var_names = variable_names
+  var_names = variable_names,
+  gradient_derivative_method = "simple"
 )
-TC_test
-
-deltas <- do.call(computeDeltas, TC_test$fits)
-deltas
-
-test_results <- do.call(computeD, deltas)
 test_results
 
-TC_test$results
+deltas <- do.call(computeDeltas, test_results$fits)
+deltas
+
+test_results_by_hand <- do.call(computeD, deltas)
+test_results_by_hand
+
+test_results$results
 
 }
 \references{

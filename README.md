@@ -3,7 +3,7 @@
 
 <!-- badges: start -->
 
-[![lifecycle](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://www.tidyverse.org/lifecycle/#stable)
+[![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
 [![Codecov test
 coverage](https://codecov.io/gh/BarkleyBG/glmerGOF/branch/master/graph/badge.svg)](https://codecov.io/gh/BarkleyBG/glmerGOF?branch=master)
 [![Travis-CI Build
@@ -44,7 +44,7 @@ which takes as mandatory input:
 Once the two models are fitted, then test statistics can be found:
 
 ``` r
-TC_test <- testGOF(
+test_results <- testGOF(
   data = my_data,
   fitted_model_clogit = fit_clogit,
   fitted_model_glmm  = fit_glmm,
@@ -56,13 +56,15 @@ TC_test <- testGOF(
 The test results can be shown as:
 
 ``` r
-TC_test$results
+test_results$results
 # $D
 # [1] 1.230103
 # 
 # $p_value
 # [1] 0.267387
 ```
+
+Please see the Introduction vignette for a working example.
 
 # Potential future developments
 

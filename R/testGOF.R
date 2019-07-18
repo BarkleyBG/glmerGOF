@@ -75,13 +75,17 @@
 #'   method = "exact"
 #' )
 #'
-#' TC_test <- testGOF(
+#' test_results <- testGOF(
 #'   data = my_data,
 #'   fitted_model_clogit = fit_clogit,
 #'   fitted_model_glmm  = fit_glmm,
-#'   var_names = variable_names
+#'   var_names = variable_names,
+#'   gradient_derivative_method = "simple"
 #' )
-#' TC_test
+#' test_results
+#'
+#'
+#'
 #'
 #'
 #' @export

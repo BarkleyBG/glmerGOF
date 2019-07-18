@@ -43,18 +43,19 @@
 #'   method = "exact"
 #' )
 #'
-#' TC_test <- testGOF(
+#' test_results <- testGOF(
 #'   data = my_data,
 #'   fitted_model_clogit = fit_clogit,
 #'   fitted_model_glmm  = fit_glmm,
-#'   var_names = variable_names
+#'   var_names = variable_names,
+#'   gradient_derivative_method = "simple"
 #' )
-#' TC_test
+#' test_results
 #'
-#' deltas <- do.call(computeDeltas, TC_test$fits)
+#' deltas <- do.call(computeDeltas, test_results$fits)
 #'
 #' deltas
-#' TC_test$fits[c("delta", "sigma_delta")]
+#' test_results$fits[c("delta", "sigma_delta")]
 #'
 #' @export
 computeDeltas <- function(

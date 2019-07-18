@@ -1,3 +1,7 @@
+# glmerGOF 0.1.1
+
+* Fixes the function examples
+
 # glmerGOF 0.1.0
 
 * Initial (Pre-)Release of the glmerGOF package.
