@@ -74,6 +74,17 @@ fit_clogit <- survival::clogit(
 
 ## Compute goodness of fit statistic
 
+
+```{r}
+delta <- fit_clogit$coefficients - lme4::getME(fit_glmm, "fixef")[-1]
+
+sigma <- fit_clogit$var - vcov(fit_glmm)[-1,-1]
+
+t(delta) %*% solve(sigma) %*% delta
+```
+
+
+
 ```{r testGOF}
 
 TC_test <- glmerGOF::testGOF(

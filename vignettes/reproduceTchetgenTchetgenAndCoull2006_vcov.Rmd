@@ -1,0 +1,189 @@
+---
+title: "Reproducing Results from Tchetgen Tchetgen and Coull (2006)"
+author: "Brian G. Barkley"
+date: "`r Sys.Date()`"
+output: 
+  html_notebook
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+  , eval = TRUE
+  # , eval = ifelse(interactive(), TRUE, FALSE)
+)
+```
+
+This vignette is designed to show similarities and differences with the SAS implementation of this goodness of fit test. Here, we analyse the dataset from Tchetgen and Coull (2006), and compare the test results to those shown in the paper.
+
+# Compute GOF with glmerGOF package
+
+```{r libraries}
+library(glmerGOF)
+library(lme4)
+library(survival)
+```
+
+
+## Download and prepare data
+
+```{r data, message = FALSE, include=FALSE}
+
+amenorrhea_url <- "https://content.sph.harvard.edu/fitzmaur/ala/amenorrhea.txt"
+
+amenorrhea_data <- data.table::fread(
+  input = amenorrhea_url,
+  sep = " ",
+  na.strings = ".",
+  skip = 43,
+  col.names = c("ID", "Dose", "Occasion", "AmenorrheaStatus")
+)
+amenorrhea_data$Occasion_squared <-  (amenorrhea_data$Occasion)^2
+```
+
+## Fit models
+
+### Generalized Linear Mixed Model
+
+```{r glmer, messsage=FALSE, warning=FALSE}
+fit_glmm <- lme4::glmer(
+  formula =
+    AmenorrheaStatus ~ Occasion + Occasion_squared + Dose:Occasion +
+    Dose:Occasion_squared  + (1 | ID), 
+  family = "binomial", 
+  data = amenorrhea_data, 
+  nAGQ = 50
+)
+```
+
+### Conditional Logistic Regression
+
+```{r clogit}
+fit_clogit <- survival::clogit(
+  formula =
+    AmenorrheaStatus ~ Occasion + Occasion_squared + Dose:Occasion +
+    Dose:Occasion_squared  + strata(ID),
+  data = amenorrhea_data,
+  method = "exact"
+)
+```
+
+## Compute goodness of fit statistic
+
+
+```{r}
+delta <- fit_clogit$coefficients - lme4::getME(fit_glmm, "fixef")[-1]
+
+sigma <- fit_clogit$var - vcov(fit_glmm)[-1,-1]
+
+TC_stat <- as.numeric(t(delta) %*% solve(sigma) %*% delta)
+
+TC_stat
+```
+
+with p-value:
+
+```{r}
+round(1-pchisq(as.numeric(TC_stat), df=4), digits = 4)
+```
+
+The results listed in TC's paper are $D$ = 14.29, $p$ = .0064
+
+
+
+## Fit glmm with varying nAGQ 
+
+```{r glmer 10 , messsage=FALSE, warning=FALSE}
+fit_glmm_10 <- lme4::glmer(
+  formula =
+    AmenorrheaStatus ~ Occasion + Occasion_squared + Dose:Occasion +
+    Dose:Occasion_squared  + (1 | ID), 
+  family = "binomial", 
+  data = amenorrhea_data, 
+  nAGQ = 10
+)
+```
+
+
+```{r glmer 5, messsage=FALSE, warning=FALSE}
+fit_glmm_5 <- lme4::glmer(
+  formula =
+    AmenorrheaStatus ~ Occasion + Occasion_squared + Dose:Occasion +
+    Dose:Occasion_squared  + (1 | ID), 
+  family = "binomial", 
+  data = amenorrhea_data, 
+  nAGQ = 5
+)
+```
+
+
+```{r glmer 2, messsage=FALSE, warning=FALSE}
+fit_glmm_2 <- lme4::glmer(
+  formula =
+    AmenorrheaStatus ~ Occasion + Occasion_squared + Dose:Occasion +
+    Dose:Occasion_squared  + (1 | ID), 
+  family = "binomial", 
+  data = amenorrhea_data, 
+  nAGQ = 2
+)
+```
+
+
+
+```{r glmer 1, messsage=FALSE, warning=FALSE}
+fit_glmm_1 <- lme4::glmer(
+  formula =
+    AmenorrheaStatus ~ Occasion + Occasion_squared + Dose:Occasion +
+    Dose:Occasion_squared  + (1 | ID), 
+  family = "binomial", 
+  data = amenorrhea_data, 
+  nAGQ = 1 #default
+)
+```
+
+
+```{r}
+calcTC <- function(fit_glmm, fit_clogit){
+  
+  delta <- fit_clogit$coefficients - lme4::getME(fit_glmm, "fixef")[-1]
+  
+  sigma <- fit_clogit$var - vcov(fit_glmm)[-1,-1]
+  
+  TC_stat <- as.numeric(t(delta) %*% solve(sigma) %*% delta)
+  
+  p_val <- round(1-pchisq(as.numeric(TC_stat), df=4), digits = 4)
+
+  out_df <- data.frame(
+    nAQG = fit_glmm@call$nAGQ
+    , TC_stat = TC_stat
+    , p_val = p_val
+  )
+  out_df
+}
+
+tc_df_1  <- calcTC(fit_glmm = fit_glmm_1, fit_clogit = fit_clogit)
+tc_df_2  <- calcTC(fit_glmm = fit_glmm_2, fit_clogit = fit_clogit)
+tc_df_5  <- calcTC(fit_glmm = fit_glmm_5, fit_clogit = fit_clogit)
+tc_df_10 <- calcTC(fit_glmm = fit_glmm_10, fit_clogit = fit_clogit)
+tc_df_50 <- calcTC(fit_glmm = fit_glmm, fit_clogit = fit_clogit)
+
+tc_results <- rbind(
+  tc_df_50,
+  tc_df_10,
+  tc_df_5,
+  tc_df_2,
+  tc_df_1
+)
+```
+
+```{r}
+tc_results
+```
+
+
+The results listed in TC's paper are $D$ = 14.29, $p$ = .0064
+
+
+
+
